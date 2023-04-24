@@ -1,0 +1,442 @@
+package programasupermercado;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class ProgramaSupermercado {
+
+    public static void main(String[] args) {
+        ArrayList<Cliente> clientes = new ArrayList<>();
+        ArrayList<Vendedor> vendedores = new ArrayList<>();
+        ArrayList<Departamento> departamentos = new ArrayList<>();
+        ArrayList<Municipio> municipios = new ArrayList<>();
+        ArrayList<Proveedor> proveedores = new ArrayList<>();
+        ArrayList<Categoria> categorias = new ArrayList<>();
+        ArrayList<Producto> productos = new ArrayList<>();
+        ArrayList<Existencia> existencias = new ArrayList<>();
+        ArrayList<Pedido> pedidos = new ArrayList<>();
+        ArrayList<Venta> ventas = new ArrayList<>();
+        ControlInventario objControlInventario = new ControlInventario();
+
+        Balance balance = new Balance();//Ganancias
+        Balance totalesPedido = new Balance();
+        Balance totalesVenta = new Balance();
+
+        //Cliente cliente1 = new Cliente("123456789", "CC", "Juan", "Pérez", "natural", LocalDate.of(2023, 4, 22), "Mocoa");
+        //Producto objProducto1 = new Producto("001", "Arepas", "Arepas de queso", new BigDecimal("5.20"), new BigDecimal("10.20"));
+        //Venta objVenta = new Venta(LocalDate.now(), cliente1, objProducto1, 20);
+        Scanner sc = new Scanner(System.in);
+        Scanner scannerString = new Scanner(System.in);
+        int opcion;
+        String tipo;
+        while (true) {
+            System.out.println("1. Registrar Lugares");
+            System.out.println("2. Registrar Categoria");
+            System.out.println("3. Registrar Producto");
+            System.out.println("4. Registrar Proveedor");
+            System.out.println("5. Registrar Vendedor");
+            System.out.println("6. Registrar Cliente");
+            System.out.println("7. Mostrar Existencias");
+            System.out.println("8. Registrar Pedido");
+            System.out.println("9. Registrar Venta");
+            System.out.println("10. Ver inventario");
+            System.out.println("11. Ver ganancia");
+            System.out.println("12. Salir");
+            System.out.println("Digite la opcion a elegir:");
+            opcion = sc.nextInt();
+
+            switch (opcion) {
+                case 1: {
+                    Scanner scanerCase3 = new Scanner(System.in);
+                    System.out.println("Desea registrar un municipio o departamento? (M/D): ");
+                    tipo = scanerCase3.nextLine();
+                    switch (tipo) {
+                        case "M":
+                            System.out.println("Ingrese el nombre del municipio: ");
+                            String nombreMunicipio = scanerCase3.nextLine();
+                            System.out.println("Ingrese el codigo del municipio: ");
+                            String codigoMunicipio = scanerCase3.nextLine();
+                            System.out.println("Ingrese el codigo del departamento: ");
+                            int codigoDepartamento = scanerCase3.nextInt();
+                            //Buscar el departamento 
+                            Departamento departamento = null;
+                            for (Departamento d : departamentos) {
+                                if (d.getCodigoDepartamento() == codigoDepartamento) {
+                                    departamento = d;
+                                }
+                            }
+                            //Si el departamento existe
+                            if (departamento != null) {
+                                Municipio municipio = new Municipio(codigoMunicipio, nombreMunicipio, departamento);
+                                municipios.add(municipio);
+                                System.out.println("Municipio registrado exitosamente");
+                            } else {
+                                System.out.println("El departamento no existe");
+                            }
+                            break;
+                        case "D":
+                            System.out.println("Ingrese el nombre del departamento: ");
+                            String nombreDepartamento = scanerCase3.nextLine();
+                            System.out.println("Ingrese el codigo del departamento: ");
+                            int codigoDep = scanerCase3.nextInt();
+                            System.out.println("Ingrese el codigo del pais: ");
+                            int codigoPais = scanerCase3.nextInt();
+
+                            Departamento departamento2 = new Departamento(codigoDep, nombreDepartamento, codigoPais);
+                            departamentos.add(departamento2);
+                            System.out.println("Departamento registrado exitosamente");
+                            break;
+                    }
+                    break;
+                }
+
+                case 2: {
+                    Scanner scanerCase5 = new Scanner(System.in);
+                    Scanner scanerCase5Str = new Scanner(System.in);
+                    System.out.println("Ingrese el id de la categoria de los productos: ");
+                    int id = scanerCase5.nextInt();
+                    System.out.println("Ingrese la categoria de los productos: ");
+                    String tipoProducto = scanerCase5Str.nextLine();
+                    Categoria categoria = new Categoria(id, tipoProducto);
+                    categorias.add(categoria);
+                    System.out.println("Categoria registrada exitosamente");
+
+                    break;
+                }
+                case 3: {
+                    Scanner scanerCase6 = new Scanner(System.in);
+                    System.out.println("Ingrese el codigo del producto: ");
+                    String codigoProducto = scanerCase6.nextLine();
+                    System.out.println("Ingrese el nombre del producto: ");
+                    String nombreProducto = scanerCase6.nextLine();
+                    System.out.println("Ingrese la descripcion del producto: ");
+                    String descripcion = scanerCase6.nextLine();
+                    System.out.println("Ingrese el costo del producto: ");
+                    BigDecimal costo = scanerCase6.nextBigDecimal();
+                    System.out.println("Ingrese el precio del producto: ");
+                    BigDecimal precio = scanerCase6.nextBigDecimal();
+                    System.out.println("Ingrese el id de la categoria del producto del producto: ");
+                    int idCategoria = scanerCase6.nextInt();
+                    Categoria categoria = null;
+                    for (Categoria c : categorias) {
+                        if (c.getId() == idCategoria) {
+                            categoria = c;
+                        }
+                    }
+                    if (categoria == null) {
+                        System.out.println("La categoria ingresada no existe");
+                        break;
+                    }
+                    Producto producto = new Producto(codigoProducto, nombreProducto, descripcion, costo, precio, categoria);
+                    productos.add(producto);
+
+                    System.out.println("Producto registrado exitosamente");
+                    break;
+                }
+
+                case 4: {
+                    Scanner scanerCase4 = new Scanner(System.in);
+                    System.out.println("Ingrese el nombre del proveedor: ");
+                    String nombre = scanerCase4.nextLine();
+                    System.out.println("Ingrese el apellido del proveedor: ");
+                    String apellido = scanerCase4.nextLine();
+                    System.out.println("Ingrese la cédula del proveedor: ");
+                    String cedula = scanerCase4.nextLine();
+                    System.out.println("Ingrese el tipo de cédula del proveedor: ");
+                    String tipoCedula = scanerCase4.nextLine();
+                    System.out.println("Ingrese el tipo de persona del proveedor: ");
+                    String tipoPersona = scanerCase4.nextLine();
+                    System.out.println("Ingrese el codigo del municipio del proveedor: ");
+                    String lugarProcedencia = scanerCase4.nextLine();
+
+                    //Buscar el municipio 
+                    Municipio municipio = null;
+                    for (Municipio m : municipios) {
+                        if (m.getCodigoMunicipio().equals(lugarProcedencia)) {
+                            municipio = m;
+                        }
+                    }
+                    //Si el municipio existe
+                    if (municipio != null) {
+                        LocalDate fechaRegistro = LocalDate.now();
+                        Proveedor proveedor = new Proveedor(cedula, tipoCedula, nombre, apellido, tipoPersona, fechaRegistro, municipio);
+                        proveedores.add(proveedor);
+                        System.out.println("Proveedor registrado exitosamente");
+                    } else {
+                        System.out.println("El municipio no existe");
+                    }
+                    break;
+                }
+                case 5: {
+                    Scanner scanerCase2 = new Scanner(System.in);
+                    System.out.println("Ingrese el nombre del vendedor: ");
+                    String nombre = scanerCase2.nextLine();
+                    System.out.println("Ingrese el apellido del vendedor: ");
+                    String apellido = scanerCase2.nextLine();
+                    System.out.println("Ingrese la cédula del vendedor: ");
+                    String cedula = scanerCase2.nextLine();
+                    System.out.println("Ingrese el tipo de cédula del vendedor: ");
+                    String tipoCedula = scanerCase2.nextLine();
+                    System.out.println("Ingrese la fecha de nacimiento del vendedor: ");
+                    String fechaString = scanerCase2.nextLine();
+
+                    //Convertir el String a LocalDate
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    LocalDate fechaNacimiento = LocalDate.parse(fechaString, formatter);
+
+                    System.out.println("Ingrese el codigo del municipio de procedencia: ");
+                    String codigoMunicipio = scanerCase2.nextLine();
+
+                    //Buscar el municipio 
+                    Municipio municipio = null;
+                    for (Municipio m : municipios) {
+                        if (m.getCodigoMunicipio().equals(codigoMunicipio)) {
+                            municipio = m;
+                        }
+                    }
+                    //Si el municipio existe
+                    if (municipio != null) {
+                        LocalDate fechaRegistro = LocalDate.now();
+                        Vendedor vendedor = new Vendedor(cedula, tipoCedula, nombre, apellido, fechaRegistro, fechaNacimiento, municipio);
+                        vendedores.add(vendedor);
+                        System.out.println("Vendedor registrado exitosamente");
+                    } else {
+                        System.out.println("El municipio no existe");
+                    }
+                    break;
+                }
+
+                case 6: {
+                    System.out.println("Ingrese el nombre del cliente: ");
+                    String nombre = scannerString.nextLine();
+                    System.out.println("Ingrese el apellido del cliente: ");
+                    String apellido = scannerString.nextLine();
+                    System.out.println("Ingrese el tipo de documento del cliente: ");
+                    String tipoCedula = scannerString.nextLine();
+                    System.out.println("Ingrese el numero de documento del cliente: ");
+                    String cedula = scannerString.nextLine();
+                    System.out.println("Ingrese la fecha de nacimiento del cliente: ");
+                    String fechaString = scannerString.nextLine();
+                    System.out.println("Ingrese el codigo del municipio del cliente: ");
+                    String codigoMunicipio = scannerString.nextLine();
+
+                    //Buscar el municipio 
+                    Municipio municipio = null;
+                    for (Municipio m : municipios) {
+                        if (m.getCodigoMunicipio().equals(codigoMunicipio)) {
+                            municipio = m;
+                        }
+                    }
+                    //Si el municipio existe
+                    if (municipio != null) {
+                        //Convertir el String a LocalDate
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                        LocalDate fechaNacimiento = LocalDate.parse(fechaString, formatter);
+
+                        Cliente cliente = new Cliente(cedula, tipoCedula, nombre, apellido, "natural", fechaNacimiento, municipio);
+                        clientes.add(cliente);
+                        System.out.println("Cliente registrado exitosamente");
+                    } else {
+                        System.out.println("El municipio no existe");
+                    }
+
+                    break;
+                }
+
+                case 7: {
+                    System.out.println("Mostrar Existencias");
+                    objControlInventario.mostrarExistencias(existencias);
+                    break;
+                }
+                case 8: {
+                    //Registrar pedido es decir agregar a existencias y a pedidos.
+                    Scanner scanerCase8 = new Scanner(System.in);
+                    //Muestra una lista de proveedores
+                    System.out.println("-------------------");
+                    //Busca el proveedor
+                    if (proveedores.size() > 0) {
+                        for (int i = 0; i < proveedores.size(); i++) {
+                            System.out.println("Nombre: " + proveedores.get(i).getNom() + " " + proveedores.get(i).getApe());
+                            System.out.println("Documento: " + proveedores.get(i).getDoc());
+                            System.out.println("Tipo Documento: " + proveedores.get(i).getTD());
+                        }
+                        System.out.println("-------------------");
+                        //Busca el producto
+                        System.out.println("Productos Disponibles: ");
+                        if (productos.size() > 0) {
+                            for (int i = 0; i < productos.size(); i++) {
+                                System.out.println("Nombre: " + productos.get(i).getNombreProducto());
+                                System.out.println("Código: " + productos.get(i).getCodigoProducto());
+                                System.out.println("Descripción: " + productos.get(i).getDescripcion());
+                            }
+                            //Pide datos
+                            System.out.println("-------------------");
+                            System.out.println("Ingrese el documento del cliente: ");
+                            String doc = scanerCase8.next();
+                            System.out.println("Ingrese el código del producto: ");
+                            String cod = scanerCase8.next();
+                            System.out.println("Ingrese la cantidad a comprar: ");
+                            int cant = scanerCase8.nextInt();
+                            //Busca el proveedor y el producto
+                            Proveedor proveedor = null;
+                            Producto producto = null;
+                            for (Proveedor p : proveedores) {
+                                if (p.getDoc().equals(doc)) {
+                                    proveedor = p;
+                                }
+                            }
+                            for (Producto p : productos) {
+                                if (p.getCodigoProducto().equals(cod)) {
+                                    producto = p;
+                                }
+                            }
+                            //Si el proveedor y el producto existen
+                            if (proveedor != null && producto != null) {
+                                //Crea el pedido
+                                Pedido pedido = new Pedido(LocalDate.now(), proveedor, producto, cant);
+                                pedidos.add(pedido);
+                                //Crea la existencia
+                                Existencia existencia = new Existencia(cod, cant);
+                                boolean existe = false;
+                                for (Existencia e : existencias) {
+                                    if (e.getCodigoProducto().equals(cod)) {
+                                        e.setCantidad(e.getCantidad() + cant);
+                                        existe = true;
+                                    }
+                                }
+                                if (existe == false) {
+                                    existencias.add(existencia);
+                                }
+                                System.out.println("Pedido realizado exitosamente");
+//se agrega a         Balance totalesPedido = new Balance();
+                                BigDecimal total = producto.getPrecio().multiply(BigDecimal.valueOf(cant));
+                                //Agrega el total del pedido al balance
+                                totalesPedido.Agregar(total);
+                            } else {
+                                System.out.println("No se ha encontrado el proveedor o el producto");
+                            }
+                        } else {
+                            System.out.println("No hay productos registrados");
+                        }
+                    } else {
+                        System.out.println("No hay proveedores registrados");
+                    }
+                    break;
+                }
+
+                case 9: {
+                    //Registrar venta
+                    Scanner scanerCase9 = new Scanner(System.in);
+                    System.out.println("-------------------");
+                    //Busca el cliente
+                    if (clientes.size() > 0) {
+                        for (int i = 0; i < clientes.size(); i++) {
+                            System.out.println("Nombre: " + clientes.get(i).getNom() + " " + clientes.get(i).getApe());
+                            System.out.println("Documento: " + clientes.get(i).getDoc());
+                            System.out.println("Tipo Documento: " + clientes.get(i).getTD());
+                        }
+                        System.out.println("-------------------");
+                        //Busca el producto
+                        System.out.println("Productos Disponibles: ");
+                        if (productos.size() > 0) {
+                            for (int i = 0; i < productos.size(); i++) {
+                                System.out.println("Nombre: " + productos.get(i).getNombreProducto());
+                                System.out.println("Código: " + productos.get(i).getCodigoProducto());
+                                System.out.println("Descripción: " + productos.get(i).getDescripcion());
+                            }
+                            //Pide datos
+                            System.out.println("-------------------");
+                            System.out.println("Ingrese el documento del cliente: ");
+                            String doc = scanerCase9.next();
+                            System.out.println("Ingrese el código del producto: ");
+                            String cod = scanerCase9.next();
+                            System.out.println("Ingrese la cantidad a comprar: ");
+                            int cant = scanerCase9.nextInt();
+                            //Busca el cliente y el producto
+                            Cliente cliente = null;
+                            Producto producto = null;
+                            for (Cliente c : clientes) {
+                                if (c.getDoc().equals(doc)) {
+                                    cliente = c;
+                                }
+                            }
+                            for (Producto p : productos) {
+                                if (p.getCodigoProducto().equals(cod)) {
+                                    producto = p;
+                                }
+                            }
+                            //Si el cliente y el producto existen
+                            if (cliente != null && producto != null) {
+                                //Busca existencia
+                                Existencia existencia = null;
+                                for (Existencia e : existencias) {
+                                    if (e.getCodigoProducto().equals(cod)) {
+                                        existencia = e;
+                                    }
+                                }
+                                if (existencia != null && existencia.getCantidad() >= cant) {
+                                    //Crea la venta
+                                    Venta venta = new Venta(LocalDate.now(), cliente, producto, cant);
+                                    ventas.add(venta);
+                                    //Actualiza existencia
+                                    existencia.setCantidad(existencia.getCantidad() - cant);
+                                    System.out.println("Venta realizada exitosamente");
+//Se agrega a         Balance totalesVenta = new Balance();
+                                    BigDecimal total = producto.getPrecio().multiply(BigDecimal.valueOf(cant));
+                                    //Agrega el total de la venta al balance
+                                    totalesVenta.Agregar(total);
+                                } else {
+                                    System.out.println("No hay suficientes existencias para la venta");
+                                }
+                            } else {
+                                System.out.println("No se ha encontrado el cliente o el producto");
+                            }
+                        } else {
+                            System.out.println("No hay productos registrados");
+                        }
+                    } else {
+                        System.out.println("No hay clientes registrados");
+                    }
+                    break;
+
+                }
+
+                case 10: {
+                    System.out.println("-------------------");
+                    System.out.println("Inventario");
+                    if (existencias.size() > 0) {
+                        for (int i = 0; i < existencias.size(); i++) {
+                            System.out.println("Producto: " + existencias.get(i).getCodigoProducto());
+                            System.out.println("Cantidad: " + existencias.get(i).getCantidad());
+                        }
+                    } else {
+                        System.out.println("No hay existencias registradas.");
+                    }
+                    break;
+                }
+
+                case 11: {
+                    BigDecimal gananciaTotal = BigDecimal.ZERO;
+                    if (ventas.size() > 0) {
+                        for (int i = 0; i < ventas.size(); i++) {
+                            gananciaTotal = gananciaTotal.add(ventas.get(i).getPrecioTotal());
+                        }
+                        System.out.println("La ganancia total es: " + gananciaTotal);
+                    } else {
+                        System.out.println("No hay ventas registradas.");
+                    }
+                    break;
+                }
+
+                default:
+                    System.out.println(
+                            "Opcion incorrecta");
+            }
+        }
+    }
+
+}
